@@ -15,17 +15,17 @@ int first(Mask mask) {
 bool solve(Mask mask, int k) {
     int u = -1;
     int v = -1;
-    Mask unchecked = mask;
 
     // Ищем любое ребро, у которого оба конца ещё находятся в mask.
-    while (unchecked != 0) {
-        u = first(unchecked);
+    for (u = 0; u < static_cast<int>(adj.size()); ++u) {
+        if ((mask & (Mask{1} << u)) == 0) {
+            continue;
+        }
         const Mask neighbors = adj[u] & mask;
         if (neighbors != 0) {
             v = first(neighbors);
             break;
         }
-        unchecked &= unchecked - 1;
     }
 
     if (v == -1) {

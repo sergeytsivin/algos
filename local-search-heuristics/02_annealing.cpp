@@ -13,7 +13,7 @@ std::uint64_t next(std::uint64_t& state) {
     return state;
 }
 
-}  // namespace
+}
 
 int main() {
     std::ios::sync_with_stdio(false);

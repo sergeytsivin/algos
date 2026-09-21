@@ -56,7 +56,7 @@ Result local_search(const std::vector<std::pair<int, int>>& edges,
     return {value, side};
 }
 
-}  // namespace
+}
 
 int main() {
     std::ios::sync_with_stdio(false);
