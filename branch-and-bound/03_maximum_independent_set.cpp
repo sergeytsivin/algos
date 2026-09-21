@@ -58,7 +58,7 @@ void search(Mask candidates, Mask current_set, int current_size) {
     search(after_skip, current_set, current_size);
 }
 
-}  // пространство имён
+}  // namespace
 
 int main() {
     std::ios::sync_with_stdio(false);

@@ -53,7 +53,7 @@ bool has_independent_set(Mask candidates, int need) {
     return has_independent_set(candidates & ~vertex_bit, need);
 }
 
-}  // пространство имён
+}  // namespace
 
 int main() {
     std::ios::sync_with_stdio(false);

@@ -6,104 +6,66 @@ using Mask = std::uint64_t;
 
 namespace {
 
-std::vector<Mask> adjacency;
+std::vector<Mask> adj;
 
-int firstVertex(Mask mask) {
+int first(Mask mask) {
     return __builtin_ctzll(mask);
 }
 
-// Максимальное по включению паросочетание даёт нижнюю оценку размера вершинного
-// покрытия: его рёбра не имеют общих концов, поэтому для каждого из них нужна
-// отдельная выбранная вершина.
-int matchingLowerBound(Mask alive) {
-    int matchingSize = 0;
-    Mask unused = alive;
+bool solve(Mask mask, int k) {
+    int u = -1;
+    int v = -1;
+    Mask unchecked = mask;
 
-    while (unused != 0) {
-        const int vertex = firstVertex(unused);
-        unused &= ~(Mask{1} << vertex);
-
-        const Mask neighbors = adjacency[vertex] & unused;
-        if (neighbors == 0) {
-            continue;
+    // Ищем любое ребро, у которого оба конца ещё находятся в mask.
+    while (unchecked != 0) {
+        u = first(unchecked);
+        const Mask neighbors = adj[u] & mask;
+        if (neighbors != 0) {
+            v = first(neighbors);
+            break;
         }
-
-        const int neighbor = firstVertex(neighbors);
-        unused &= ~(Mask{1} << neighbor);
-        ++matchingSize;
+        unchecked &= unchecked - 1;
     }
 
-    return matchingSize;
-}
-
-bool hasVertexCover(Mask alive, int remaining) {
-    if (remaining < 0) {
+    if (v == -1) {
+        return true;
+    }
+    if (k == 0) {
         return false;
     }
 
-    int branchVertex = -1;
-    int bestDegree = 0;
-    Mask candidates = alive;
-
-    // Для ветвления подходит любое непокрытое ребро. Выбор его конца с
-    // максимальной текущей степенью — лишь эвристика, часто сокращающая перебор.
-    while (candidates != 0) {
-        const int vertex = firstVertex(candidates);
-        candidates &= candidates - 1;
-
-        const int degree = __builtin_popcountll(adjacency[vertex] & alive);
-        if (degree > bestDegree) {
-            bestDegree = degree;
-            branchVertex = vertex;
-        }
-    }
-
-    if (branchVertex == -1) {
-        return true;  // Непокрытых рёбер не осталось.
-    }
-    if (remaining == 0 || matchingLowerBound(alive) > remaining) {
-        return false;
-    }
-
-    const Mask liveNeighbors = adjacency[branchVertex] & alive;
-    const int neighbor = firstVertex(liveNeighbors);
-    const Mask branchBit = Mask{1} << branchVertex;
-    const Mask neighborBit = Mask{1} << neighbor;
-
-    // Для непокрытого ребра (branchVertex, neighbor) в покрытие должен входить
-    // хотя бы один конец. Удаление выбранной вершины покрывает все её рёбра.
-    return hasVertexCover(alive & ~branchBit, remaining - 1) ||
-           hasVertexCover(alive & ~neighborBit, remaining - 1);
+    // В покрытие должен входить хотя бы один конец ребра (u, v).
+    return solve(mask & ~(Mask{1} << u), k - 1) ||
+           solve(mask & ~(Mask{1} << v), k - 1);
 }
 
-}  // пространство имён
+}  // namespace
 
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
 
-    int vertexCount;
-    int edgeCount;
-    int coverLimit;
-    if (!(std::cin >> vertexCount >> edgeCount >> coverLimit)) {
+    int n;
+    int m;
+    int k;
+    if (!(std::cin >> n >> m >> k)) {
         return 0;
     }
 
-    adjacency.assign(vertexCount, 0);
-    for (int i = 0; i < edgeCount; ++i) {
-        int from;
-        int to;
-        std::cin >> from >> to;
-        --from;
-        --to;
+    adj.assign(n, 0);
+    for (int i = 0; i < m; ++i) {
+        int u;
+        int v;
+        std::cin >> u >> v;
+        --u;
+        --v;
 
         // Кратные рёбра лишь повторно устанавливают те же биты.
-        adjacency[from] |= Mask{1} << to;
-        adjacency[to] |= Mask{1} << from;
+        adj[u] |= Mask{1} << v;
+        adj[v] |= Mask{1} << u;
     }
 
-    const Mask allVertices = vertexCount == 0
-                                 ? 0
-                                 : (Mask{1} << vertexCount) - 1;
-    std::cout << (hasVertexCover(allVertices, coverLimit) ? "YES\n" : "NO\n");
+    const Mask all = (Mask{1} << n) - 1;
+    std::cout << (solve(all, k) ? "YES\n" : "NO\n");
 }

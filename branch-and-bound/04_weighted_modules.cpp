@@ -89,7 +89,7 @@ void search(Mask candidates, int need, long long current_weight, Mask selected) 
     search(candidates & ~vertex_bit, need, current_weight, selected);
 }
 
-}  // пространство имён
+}  // namespace
 
 int main() {
     std::ios::sync_with_stdio(false);
