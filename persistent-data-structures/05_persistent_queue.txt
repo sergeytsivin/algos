@@ -1,0 +1,21 @@
+3 20
+push 0 10
+push 1 20
+push 2 30
+pop 3
+push 4 40
+front 3
+front 5
+pop 5
+pop 6
+front 7
+pop 7
+size 8
+push 8 -5
+front 9
+push 1 99
+pop 10
+front 11
+front 2
+size 5
+size 0
