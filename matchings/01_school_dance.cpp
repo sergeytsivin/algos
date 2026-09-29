@@ -2,17 +2,18 @@
 #include <iostream>
 #include <vector>
 
-using std::vector;
+using namespace std;
 
-bool dfs(vector<vector<int>>& graphA, int vA,
-         vector<int>& visitedA, vector<int>& pairFromA) {
-    if (visitedA[vA]) return false;
-    visitedA[vA] = 1;
-    for (int vB : graphA[vA]) {
-        if (pairFromA[vB] == -1 ||
-            dfs(graphA, pairFromA[vB], visitedA, pairFromA)) {
+vector<vector<int>> g;
+vector<int> mt, used;
+
+bool dfs(int v) {
+    if (used[v]) return false;
+    used[v] = 1;
+    for (int u : g[v]) {
+        if (mt[u] == -1 || dfs(mt[u])) {
             // Меняем пару только после нахождения продолжения пути.
-            pairFromA[vB] = vA;
+            mt[u] = v;
             return true;
         }
     }
@@ -21,25 +22,26 @@ bool dfs(vector<vector<int>>& graphA, int vA,
 
 int main() {
     int n, m, k;
-    if (!(std::cin >> n >> m >> k)) return 0;
-    vector<vector<int>> graphA(n);
+    if (!(cin >> n >> m >> k)) return 0;
+    g.resize(n);
     for (int i = 0; i < k; ++i) {
         int a, b;
-        std::cin >> a >> b;
-        graphA[a - 1].push_back(b - 1);
+        cin >> a >> b;
+        g[a - 1].push_back(b - 1);
     }
 
-    vector<int> visitedA(n), pairFromA(m, -1);
+    used.resize(n);
+    mt.assign(m, -1);
     int ans = 0;
-    for (int vA = 0; vA < n; ++vA) {
-        std::fill(visitedA.begin(), visitedA.end(), 0);
-        if (dfs(graphA, vA, visitedA, pairFromA)) ++ans;
+    for (int v = 0; v < n; ++v) {
+        fill(used.begin(), used.end(), 0);
+        if (dfs(v)) ++ans;
     }
 
-    std::cout << ans << '\n';
-    for (int vB = 0; vB < m; ++vB) {
-        if (pairFromA[vB] != -1) {
-            std::cout << pairFromA[vB] + 1 << ' ' << vB + 1 << '\n';
+    cout << ans << '\n';
+    for (int u = 0; u < m; ++u) {
+        if (mt[u] != -1) {
+            cout << mt[u] + 1 << ' ' << u + 1 << '\n';
         }
     }
 }

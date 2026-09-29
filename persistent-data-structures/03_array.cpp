@@ -1,4 +1,3 @@
-#include <deque>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -9,18 +8,14 @@ struct Node {
     Node* right;
 };
 
-std::deque<Node> pool;
-
 Node* build(const std::vector<int>& a, int l, int r) {
     if (r - l == 1) {
-        pool.push_back({a[l], nullptr, nullptr});
-    } else {
-        int m = (l + r) / 2;
-        Node* left = build(a, l, m);
-        Node* right = build(a, m, r);
-        pool.push_back({0, left, right});
+        return new Node{a[l], nullptr, nullptr};
     }
-    return &pool.back();
+    int m = (l + r) / 2;
+    Node* left = build(a, l, m);
+    Node* right = build(a, m, r);
+    return new Node{0, left, right};
 }
 
 int getElement(const Node* v, int l, int r, int i) {

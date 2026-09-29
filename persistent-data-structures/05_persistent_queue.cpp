@@ -1,4 +1,3 @@
-#include <deque>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -15,18 +14,14 @@ struct Version {
     int size;
 };
 
-std::deque<Node> pool;
-
 const Node* build(int l, int r) {
     if (r - l == 1) {
-        pool.push_back({0, nullptr, nullptr});
-    } else {
-        int m = (l + r) / 2;
-        const Node* left = build(l, m);
-        const Node* right = build(m, r);
-        pool.push_back({0, left, right});
+        return new Node{0, nullptr, nullptr};
     }
-    return &pool.back();
+    int m = (l + r) / 2;
+    const Node* left = build(l, m);
+    const Node* right = build(m, r);
+    return new Node{0, left, right};
 }
 
 int getElement(const Node* v, int l, int r, int i) {
@@ -41,8 +36,7 @@ int getElement(const Node* v, int l, int r, int i) {
 }
 
 const Node* setElement(const Node* v, int l, int r, int i, int x) {
-    pool.push_back(*v);
-    Node* u = &pool.back();
+    Node* u = new Node(*v);
     if (r - l == 1) {
         u->x = x;
     } else {

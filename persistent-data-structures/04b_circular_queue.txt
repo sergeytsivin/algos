@@ -1,0 +1,22 @@
+3 21
+size
+push 10
+push 20
+front
+size
+pop
+push 30
+push 40
+front
+size
+pop
+pop
+front
+pop
+size
+push -5
+front
+push 0
+pop
+front
+size

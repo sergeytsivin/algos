@@ -235,17 +235,18 @@ def build():
     one, rest = ("## 1. Стек на списке" + rest).split("### На доске: история стека", 1)
     stack_board, rest = ("### На доске: история стека" + rest).split("## 2. Персистентный стек", 1)
     two, rest = ("## 2. Персистентный стек" + rest).split("## 3. Массив на дереве отрезков", 1)
-    three, rest = ("## 3. Массив на дереве отрезков" + rest).split("### На доске: история массива", 1)
-    array_board, rest = ("### На доске: история массива" + rest).split("## 4. Персистентный массив", 1)
-    four, rest = ("## 4. Персистентный массив" + rest).split("### Обсуждение: почему с очередью сложнее?", 1)
-    queue_board, rest = ("### Обсуждение: почему с очередью сложнее?" + rest).split("## 5. ", 1)
+    three, rest = ("## 3. Массив на дереве отрезков" + rest).split("## 4. Персистентный массив", 1)
+    four, rest = ("## 4. Персистентный массив" + rest).split("## 4a. Очередь на списке", 1)
+    four_a, rest = ("## 4a. Очередь на списке" + rest).split("### Обсуждение: почему с очередью сложнее?", 1)
+    queue_board, rest = ("### Обсуждение: почему с очередью сложнее?" + rest).split("## 4b. Очередь на циклическом массиве", 1)
+    four_b, rest = ("## 4b. Очередь на циклическом массиве" + rest).split("## 5. ", 1)
     five = ("## 5. " + rest).split("## Примеры и проверка", 1)[0]
 
     # Печатная версия сохраняет условия; организационные указания преподавателю
     # и перечни файлов заменены примерами непосредственно на страницах.
     intro = re.sub(
         r"Листок рассчитан.*?Нужны односвязные",
-        "Задачи 1-4 выполняются на семинаре; задача 5 - домашняя.\n\nНужны односвязные",
+        "Задачи 1-4 и мини-задачи 4a, 4b выполняются на семинарах; задача 5 - домашняя.\n\nНужны односвязные",
         intro, flags=re.S,
     )
     intro = intro.replace("Эталонные решения написаны на C++17.", "Язык: C++17.")
@@ -253,8 +254,10 @@ def build():
         markdown(intro) + task_with_example(one, "01_stack"),
         markdown(stack_board) + task_with_example(two, "02_persistent_stack"),
         task_with_example(three, "03_array") + [Spacer(1, 14), Notes(100)],
-        markdown(array_board) + task_with_example(four, "04_persistent_array"),
+        task_with_example(four, "04_persistent_array"),
+        task_with_example(four_a, "04a_linked_queue") + [Spacer(1, 14), Notes(100)],
         markdown(queue_board) + [Spacer(1, 14), Notes(240)],
+        task_with_example(four_b, "04b_circular_queue"),
         [Paragraph("ДОМАШНЕЕ ЗАДАНИЕ", styles["label"])]
         + task_with_example(five, "05_persistent_queue"),
     ]

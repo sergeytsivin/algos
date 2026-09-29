@@ -1,4 +1,3 @@
-#include <deque>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -14,8 +13,7 @@ int main() {
 
     int q;
     std::cin >> q;
-    // Добавление в конец deque не меняет адреса уже созданных узлов.
-    std::deque<Node> pool;
+    // Узлы сохраняем до завершения программы: они нужны старым версиям.
     std::vector<const Node*> head(q + 1, nullptr);
     int k = 0;
     while (q--) {
@@ -25,8 +23,7 @@ int main() {
         if (op == "push") {
             int x;
             std::cin >> x;
-            pool.push_back({x, head[v]});
-            head[++k] = &pool.back();
+            head[++k] = new Node{x, head[v]};
             std::cout << k << '\n';
         } else if (op == "pop") {
             head[++k] = head[v]->next;

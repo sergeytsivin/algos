@@ -23,22 +23,22 @@ struct Stats {
 };
 
 struct Result {
-    vector<int> pairFromA;
+    vector<int> mt;
     int size = 0;
     Stats stats;
 };
 
 // В измеряемой версии Count=false: счётчиков внутри обхода нет.
 template <bool Count>
-bool dfs(const vector<vector<int>>& graphA, int vA, vector<int>& visitedA,
-         vector<int>& pairFromA, int stamp, Stats& stats) {
-    if (visitedA[vA] == stamp) return false;
-    visitedA[vA] = stamp;
-    for (int vB : graphA[vA]) {
+bool dfs(const vector<vector<int>>& g, int v, vector<int>& used,
+         vector<int>& mt, int stamp, Stats& stats) {
+    if (used[v] == stamp) return false;
+    used[v] = stamp;
+    for (int u : g[v]) {
         if constexpr (Count) ++stats.scans;
-        if (pairFromA[vB] == -1 ||
-            dfs<Count>(graphA, pairFromA[vB], visitedA, pairFromA, stamp, stats)) {
-            pairFromA[vB] = vA;
+        if (mt[u] == -1 ||
+            dfs<Count>(g, mt[u], used, mt, stamp, stats)) {
+            mt[u] = v;
             return true;
         }
     }
@@ -49,16 +49,16 @@ template <bool Count>
 Result kuhn(const Graph& graph, bool stamps, bool greedy) {
     int n = static_cast<int>(graph.g.size());
     Result result;
-    result.pairFromA.assign(graph.m, -1);
-    vector<int> visitedA(n, 0);
+    result.mt.assign(graph.m, -1);
+    vector<int> used(n, 0);
     vector<int> matchedA;
     if (greedy) {
         matchedA.assign(n, 0);
         for (int a = 0; a < n; ++a) {
             for (int b : graph.g[a]) {
                 if constexpr (Count) ++result.stats.scans;
-                if (result.pairFromA[b] == -1) {
-                    result.pairFromA[b] = a;
+                if (result.mt[b] == -1) {
+                    result.mt[b] = a;
                     matchedA[a] = 1;
                     ++result.size;
                     if constexpr (Count) ++result.stats.greedyPairs;
@@ -73,12 +73,12 @@ Result kuhn(const Graph& graph, bool stamps, bool greedy) {
         if (stamps) {
             ++stamp;
         } else {
-            std::fill(visitedA.begin(), visitedA.end(), 0);
+            std::fill(used.begin(), used.end(), 0);
             stamp = 1;
             if constexpr (Count) result.stats.clearWrites += n;
         }
         if constexpr (Count) ++result.stats.roots;
-        if (dfs<Count>(graph.g, a, visitedA, result.pairFromA, stamp, result.stats)) {
+        if (dfs<Count>(graph.g, a, used, result.mt, stamp, result.stats)) {
             ++result.size;
         }
     }
@@ -116,7 +116,7 @@ void check(const Graph& graph, const Result& result) {
     vector<int> used(graph.g.size(), 0);
     int size = 0;
     for (int b = 0; b < graph.m; ++b) {
-        int a = result.pairFromA[b];
+        int a = result.mt[b];
         if (a == -1) continue;
         if (a < 0 || a >= static_cast<int>(graph.g.size()) || used[a] ||
             std::find(graph.g[a].begin(), graph.g[a].end(), b) == graph.g[a].end()) {
